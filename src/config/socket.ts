@@ -1,14 +1,16 @@
 
 import  WebSocket  from 'ws';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { SECRET } from '../core-api/auth/jwtauth_middleware';
 import {default as MESSAGE} from '../db/schemas/MessageSchema';
 
-function validTokenForSocket(tokenString:string){
+
+function validTokenForSocket(tokenString:string) : any {
     
     if(tokenString){
       const token = tokenString.split(' ')[1];
       let authObj : any;
+
       jwt.verify(token,SECRET,(err,auth)=>{
   
         if(!err){
@@ -27,52 +29,48 @@ function initializeWebSocket(server:any){
     const wss = new WebSocket.Server({server});
    
     wss.on('connection',(socket,req)=>{ 
-
-        const token = req.headers.authtoken;
-        
-        if( !token || typeof token !== 'string'){
-            socket.close();
-            return;
-        }
-     
-        const userDetails = validTokenForSocket(token);
+        let userDetails : any = undefined;
        
-
-        if(!userDetails){
-            socket.close();
-            return;
-        }
-       
-
-        if(userDetails.email && !activeUsers.has(userDetails.email)){
-            activeUsers.set(userDetails.email,socket);
+        socket.on('message',(message)=>{
+            const parsedMessage = JSON.parse(message.toString());
             
-            socket.on('message',(message)=>{
-                console.log(message.toString());
-                const msgObj = JSON.parse(message.toString());
-                msgObj.senderId = userDetails.email;
-  
-                const receiverConn = activeUsers.get(msgObj.receiverId);
-        
-                if(receiverConn){
-                    msgObj.status = "READ"    
-                    receiverConn.send(JSON.stringify(msgObj));
+            if (parsedMessage.messageType === 'connection') {
+                userDetails = validTokenForSocket("Bearer " + parsedMessage.data);
+                
+                if(userDetails){
+                    activeUsers.set(userDetails.email,socket);
                 }else{
-                    msgObj.status = "PENDING"
-                }    
-                MESSAGE.create({...msgObj,timestamp: new Date()})
+                    socket.close();
+                }
+                console.log("Connection Established Successfully");
 
-            });
+            }else if(userDetails){
+                    parsedMessage.senderId = userDetails.email;
+                    const receiverConn = activeUsers.get(parsedMessage.receiverId);
+                    if(receiverConn){
+                        console.log("should come here");
+                         parsedMessage.status = "READ"    
+                         receiverConn.send(JSON.stringify(parsedMessage));
+                     }else{
+                         parsedMessage.status = "PENDING"
+                     }    
+                     console.log(parsedMessage);
+                     MESSAGE.create({...parsedMessage,timestamp: new Date()})
+            }else{
+                console.log("closing connection");
+                socket.close();
+            }
+
+        });
         
-            socket.on('close',()=>{
-                activeUsers.delete(userDetails.email);
-                console.log(userDetails.email + " : Disconnected");
-            });
  
-        }else {
-            socket.close();
-        }
-    
+        socket.on('close',()=>{
+            if(userDetails){
+                activeUsers.delete(userDetails.email);
+            }
+            console.log("Disconnected");
+        });
+
     });
 
 }
