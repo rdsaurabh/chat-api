@@ -19,4 +19,4 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > keyfile
           chmod 600 keyfile
           mkdir -p ~/.ssh
-          ssh -i "keyfile" ubuntu@ec2-54-242-61-107.compute-1.amazonaws.com
+          
