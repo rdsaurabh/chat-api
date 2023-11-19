@@ -1,4 +1,4 @@
-name: Deploy Chat API TEST1
+name: Deploy Chat API TEST2
 on:
   push:
     branches:
