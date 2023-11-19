@@ -20,3 +20,4 @@ jobs:
           chmod 600 keyfile
           mkdir -p ~/.ssh
           cp known_hosts ~/.ssh/known_hosts
+          ssh -i "keyfile" ubuntu@ec2-54-242-61-107.compute-1.amazonaws.com
