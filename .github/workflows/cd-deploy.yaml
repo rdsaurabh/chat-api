@@ -1,4 +1,4 @@
-name: Deploy Chat API Backend Test
+name: Deploy Chat API TEST1
 on:
   push:
     branches:
@@ -20,4 +20,4 @@ jobs:
           chmod 600 keyfile
           mkdir -p ~/.ssh
           cp known_hosts ~/.ssh/known_hosts
-          ssh -i "keyfile" ubuntu@ec2-54-242-61-107.compute-1.amazonaws.com
+          ssh -t -i keyfile ubuntu@ec2-54-88-129-122.compute-1.amazonaws.com
