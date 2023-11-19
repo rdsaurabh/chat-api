@@ -18,6 +18,7 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > keyfile
           chmod 600 keyfile
+          cat keyfile
           mkdir -p ~/.ssh
-          cp known_hosts ~/.ssh/known_hosts
-          ssh -t -i keyfile ubuntu@ec2-54-88-129-122.compute-1.amazonaws.com "sudo echo working"
+          cp knownhosts ~/.ssh/known_hosts
+          ssh -i "keyfile" ubuntu@ec2-54-242-61-107.compute-1.amazonaws.com "echo working"
