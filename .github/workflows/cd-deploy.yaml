@@ -1,4 +1,4 @@
-name: Deploy Chat API Backend
+name: Deploy Chat API Backend Test
 on:
   push:
     branches:
