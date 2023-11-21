@@ -29,7 +29,9 @@ app.use("/auth",authRouter);
 app.use("/partners",partnerRouter);
 app.use("/messages",messagesRouter);
  
-
+app.get("/",(req,res)=>{
+  res.json("Welcome to backend of chat api");
+});
 
 connectDB();
 
