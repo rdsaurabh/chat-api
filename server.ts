@@ -30,7 +30,7 @@ app.use("/partners",partnerRouter);
 app.use("/messages",messagesRouter);
  
 app.get("/",(req,res)=>{
-  res.json("Welcome to backend of chat api");
+  res.json("Welcome to backend of chat api another changes");
 });
 
 connectDB();
